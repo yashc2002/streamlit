@@ -189,12 +189,8 @@ def fetch_page_content(url):
         if response.status_code != 200:
             print(f"❌ Failed to fetch page ({response.status_code}): {url}")
             return ""
-
-        # Detect encoding and decode properly
-        encoding = response.encoding if response.encoding else 'utf-8'
-        content = response.content.decode(encoding, errors='replace')  # Replace invalid chars
-
-        soup = BeautifulSoup(content, "html.parser")
+        
+        soup = BeautifulSoup(content, "lxml")
 
         # Extract content
         headings = [h.get_text().strip() for h in soup.find_all(['h1', 'h2', 'h3'])]
