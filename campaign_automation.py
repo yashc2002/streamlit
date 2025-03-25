@@ -345,6 +345,7 @@ if campaign_generated == "No":
     all_content = ""
     for idx, url in enumerate(urls, start=1):
         content = fetch_page_content(url)
+        st.info(content)
         if len(all_content.split()) < 1000:
             all_content += f"\n---\nContent from {url}:\n{content}\n"
 
