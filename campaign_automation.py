@@ -183,7 +183,7 @@ def fetch_page_content(url):
     }
 
     try:
-        st.info(url)
+        st.info("in the function fetch page content"+url)
         response = requests.get(url, headers=headers, timeout=20)
 
         if response.status_code != 200:
@@ -348,14 +348,16 @@ page_parsed = fields.get("page_parsed", "")
 # Fetch and summarize sitemap content
 if campaign_generated == "No":
     urls = fetch_urls_from_sitemap(sitemap_url)
-
+    st.info(f"Url extracteds.")
     # if urls:
     #     st.info(f"{len(urls)} URLs found. Extracting content from the URLs...\n")
     # urls = urls[:5]
     all_content = ""
     for idx, url in enumerate(urls, start=1):
         url = "https://discplusprofiles.com/disc-plus-powerful-assessments/"
+        st.info(url)
         content = fetch_page_content(url)
+        st.info("generated content" +content)
         if len(all_content.split()) < 2000:
             all_content += f"\n---\nContent from {url}:\n{content}\n"
             st.info(all_content)
