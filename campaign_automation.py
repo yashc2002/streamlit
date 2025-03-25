@@ -155,30 +155,19 @@ def fetch_urls_from_sitemap(sitemap_url):
     Extracts all URLs from a sitemap and returns them as a list.
     """
     try:
-        headers = {
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
-            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-            "Accept-Language": "en-US,en;q=0.5",
-            "Connection": "keep-alive"
-        }
-        response = requests.get(sitemap_url, headers=headers, verify=False, timeout=10)  # Disable SSL verification
-        st.info(f"Status code: {response.status_code}")
+        headers = {"User-Agent": "Mozilla/5.0"}
+        response = requests.get(sitemap_url, headers=headers)
 
         if response.status_code == 200:
             soup = BeautifulSoup(response.text, 'xml')
-            urls = [
-                loc.text for loc in soup.find_all('loc')
-                if not loc.text.lower().endswith(('.png', '.jpg', '.jpeg', '.gif', '.svg', '.webp'))
-            ]
-            st.info(f"✅ Extracted {len(urls)} URLs")
+            urls = [loc.text for loc in soup.find_all('loc') if not loc.text.lower().endswith(('.png', '.jpg', '.jpeg', '.gif', '.svg', '.webp'))]
             return urls
         else:
-            st.error(f"❌ Failed to fetch sitemap. Status Code: {response.status_code}")
+            print(f"❌ Failed to fetch sitemap. Status Code: {response.status_code}")
             return []
     except Exception as e:
-        st.error(f"❌ Error fetching sitemap: {e}")
+        print(f"❌ Error fetching sitemap: {e}")
         return []
-
 
 # Function to fetch and extract clean text content from a webpage
 def fetch_page_content(url):
@@ -217,7 +206,7 @@ def fetch_page_content(url):
 
 def summarize_content(all_content, llm_api_key):
     """Summarizes the combined content from all pages."""
-    
+    st.info("Summarizing extracted content..."+all_content)
     # Skip summarization if content is empty
     if not all_content.strip() or "No meaningful content found" in all_content:
         st.warning("No meaningful content extracted from the sitemap.")
