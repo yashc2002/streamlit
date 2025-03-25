@@ -4,4 +4,3 @@ pyairtable
 requests
 groq
 lxml
-certifi

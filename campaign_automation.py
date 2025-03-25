@@ -6,7 +6,6 @@ import json
 import re
 from urllib.parse import urlparse
 from bs4 import BeautifulSoup
-import certifi
 
 # Airtable Configuration
 AIRTABLE_BASE_ID = "appEe8wbaC0R6HSFs"
@@ -184,13 +183,13 @@ def fetch_page_content(url):
     }
 
     try:
-        response = requests.get(url, headers=headers, timeout=10, verify=certifi.where())
+        response = requests.get(url, headers=headers, timeout=10)
 
         if response.status_code != 200:
             print(f"❌ Failed to fetch page ({response.status_code}): {url}")
             return ""
         
-        soup = BeautifulSoup(content, "lxml")
+        soup = BeautifulSoup(content, "html.parser")
 
         # Extract content
         headings = [h.get_text().strip() for h in soup.find_all(['h1', 'h2', 'h3'])]
@@ -206,8 +205,6 @@ def fetch_page_content(url):
 
 def summarize_content(all_content, llm_api_key):
     """Summarizes the combined content from all pages."""
-    st.info("Summarizing extracted content..."+all_content)
-    # Skip summarization if content is empty
     if not all_content.strip() or "No meaningful content found" in all_content:
         st.warning("No meaningful content extracted from the sitemap.")
         return "No content available to summarize."
