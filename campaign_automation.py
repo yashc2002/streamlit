@@ -349,9 +349,9 @@ page_parsed = fields.get("page_parsed", "")
 if campaign_generated == "No":
     urls = fetch_urls_from_sitemap(sitemap_url)
 
-    if urls:
-        st.info(f"{len(urls)} URLs found. Extracting content from the URLs...\n")
-    urls = urls[:5]
+    # if urls:
+    #     st.info(f"{len(urls)} URLs found. Extracting content from the URLs...\n")
+    # urls = urls[:5]
     all_content = ""
     for idx, url in enumerate(urls, start=1):
         url = "https://discplusprofiles.com/disc-plus-powerful-assessments/"
