@@ -351,10 +351,9 @@ if campaign_generated == "No":
     if urls:
         st.info(f"{len(urls)} URLs found. Extracting content from the URLs...\n")
     urls = urls[:5]
-    st.info(urls)
     all_content = ""
     for idx, url in enumerate(urls, start=1):
-        content = fetch_page_content(url)
+        content = fetch_page_content("https://discplusprofiles.com/disc-plus-powerful-assessments/")
         if len(all_content.split()) < 2000:
             all_content += f"\n---\nContent from {url}:\n{content}\n"
             st.info(all_content)
