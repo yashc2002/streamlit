@@ -176,21 +176,21 @@ def fetch_page_content(url):
     """
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-        "Referer": "https://discplusprofiles.com/",
+        "Referer": "url",
         "Accept-Language": "en-US,en;q=0.9",
         "Accept-Encoding": "gzip, deflate, br",
         "Connection": "keep-alive"
     }
 
     try:
-        response = requests.get(url, headers=headers, timeout=10)
+        response = requests.get(url, headers=headers, timeout=20)
 
         if response.status_code != 200:
             st.warning(f"❌ Failed to fetch page ({response.status_code}): {url}")
             return ""
 
         soup = BeautifulSoup(response.content, "html.parser")
-
+        st.info("soup" + soup)
         # Remove script and style tags
         for script in soup(["script", "style", "noscript"]):
             script.extract()
@@ -202,8 +202,8 @@ def fetch_page_content(url):
 
         # Combine headings, paragraphs, and large divs
         content = "\n".join(headings + paragraphs + divs)
-
-        # Display content length for debugging
+        st,info("content" + content)
+        
         st.write(f"Content length: {len(content.split())} words")
 
         return content if content else "No content extracted."
@@ -351,11 +351,14 @@ if campaign_generated == "No":
     if urls:
         st.info(f"{len(urls)} URLs found. Extracting content from the URLs...\n")
     urls = urls[:5]
+    st.info(urls)
     all_content = ""
     for idx, url in enumerate(urls, start=1):
         content = fetch_page_content(url)
-        if len(all_content.split()) < 1000:
+        if len(all_content.split()) < 2000:
             all_content += f"\n---\nContent from {url}:\n{content}\n"
+            st.info(all_content)
+
 
 
     st.info(all_content)
