@@ -6,6 +6,7 @@ import json
 import re
 from urllib.parse import urlparse
 from bs4 import BeautifulSoup
+import certifi
 
 # Airtable Configuration
 AIRTABLE_BASE_ID = "appEe8wbaC0R6HSFs"
@@ -172,7 +173,7 @@ def fetch_urls_from_sitemap(sitemap_url):
 # Function to fetch and extract clean text content from a webpage
 def fetch_page_content(url):
     """
-    Fetches and extracts clean text content from a webpage.
+    Fetches and extracts clean text content with proper encoding handling.
     """
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
@@ -183,15 +184,19 @@ def fetch_page_content(url):
     }
 
     try:
-        response = requests.get(url, headers=headers, timeout=10,verify=False)
+        response = requests.get(url, headers=headers, timeout=10, verify=certifi.where())
 
         if response.status_code != 200:
             print(f"❌ Failed to fetch page ({response.status_code}): {url}")
             return ""
 
-        soup = BeautifulSoup(response.content, "html.parser")
+        # Detect encoding and decode properly
+        encoding = response.encoding if response.encoding else 'utf-8'
+        content = response.content.decode(encoding, errors='replace')  # Replace invalid chars
 
-        # Extract content from headings and paragraphs
+        soup = BeautifulSoup(content, "html.parser")
+
+        # Extract content
         headings = [h.get_text().strip() for h in soup.find_all(['h1', 'h2', 'h3'])]
         paragraphs = [p.get_text().strip() for p in soup.find_all('p')]
 
@@ -200,9 +205,7 @@ def fetch_page_content(url):
         return content if content else "No content extracted."
 
     except Exception as e:
-        # Print the full traceback to debug the error
         print(f"❌ Exception occurred: {e}")
-        print(traceback.format_exc())
         return ""
 
 def summarize_content(all_content, llm_api_key):
