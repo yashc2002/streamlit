@@ -183,6 +183,7 @@ def fetch_page_content(url):
     }
 
     try:
+        st.info(url)
         response = requests.get(url, headers=headers, timeout=20)
 
         if response.status_code != 200:
@@ -353,7 +354,8 @@ if campaign_generated == "No":
     urls = urls[:5]
     all_content = ""
     for idx, url in enumerate(urls, start=1):
-        content = fetch_page_content("https://discplusprofiles.com/disc-plus-powerful-assessments/")
+        url = "https://discplusprofiles.com/disc-plus-powerful-assessments/"
+        content = fetch_page_content(url)
         if len(all_content.split()) < 2000:
             all_content += f"\n---\nContent from {url}:\n{content}\n"
             st.info(all_content)
