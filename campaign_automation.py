@@ -186,23 +186,32 @@ def fetch_page_content(url):
         response = requests.get(url, headers=headers, timeout=10)
 
         if response.status_code != 200:
-            print(f"❌ Failed to fetch page ({response.status_code}): {url}")
+            st.warning(f"❌ Failed to fetch page ({response.status_code}): {url}")
             return ""
 
         soup = BeautifulSoup(response.content, "html.parser")
 
-        # Extract content from headings and paragraphs
+        # Remove script and style tags
+        for script in soup(["script", "style", "noscript"]):
+            script.extract()
+
+        # Extract meaningful content
         headings = [h.get_text().strip() for h in soup.find_all(['h1', 'h2', 'h3'])]
         paragraphs = [p.get_text().strip() for p in soup.find_all('p')]
+        divs = [div.get_text().strip() for div in soup.find_all('div') if len(div.get_text().strip()) > 100]  # Only large divs
 
-        # Combine headings and paragraphs
-        content = "\n".join(headings + paragraphs)
+        # Combine headings, paragraphs, and large divs
+        content = "\n".join(headings + paragraphs + divs)
+
+        # Display content length for debugging
+        st.write(f"Content length: {len(content.split())} words")
 
         return content if content else "No content extracted."
 
     except Exception as e:
-        print(f"❌ Failed to extract page content: {e}")
+        st.error(f"❌ Failed to extract page content: {e}")
         return ""
+
 
 def summarize_content(all_content, llm_api_key):
     """Summarizes the combined content from all pages."""
