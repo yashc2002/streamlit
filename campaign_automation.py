@@ -364,7 +364,7 @@ if campaign_generated == "No":
 
 
 
-    st.info(all_content)
+    st.info("thiws is coming direct here " +all_content)
     st.info("\n Extraction complete!")
     summary = summarize_content(all_content, llm_api_key)
     save_summary_to_airtable(record_id, summary, airtable_api_key)
