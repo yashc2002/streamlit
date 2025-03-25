@@ -1,5 +1,5 @@
 streamlit
-groq
-requests
-pyairtable
 beautifulsoup4
+pyairtable
+requests
+groq
