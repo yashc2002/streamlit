@@ -155,19 +155,30 @@ def fetch_urls_from_sitemap(sitemap_url):
     Extracts all URLs from a sitemap and returns them as a list.
     """
     try:
-        headers = {"User-Agent": "Mozilla/5.0"}
-        response = requests.get(sitemap_url, headers=headers)
+        headers = {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
+            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+            "Accept-Language": "en-US,en;q=0.5",
+            "Connection": "keep-alive"
+        }
+        response = requests.get(sitemap_url, headers=headers, verify=False, timeout=10)  # Disable SSL verification
+        st.info(f"Status code: {response.status_code}")
 
         if response.status_code == 200:
             soup = BeautifulSoup(response.text, 'xml')
-            urls = [loc.text for loc in soup.find_all('loc') if not loc.text.lower().endswith(('.png', '.jpg', '.jpeg', '.gif', '.svg', '.webp'))]
+            urls = [
+                loc.text for loc in soup.find_all('loc')
+                if not loc.text.lower().endswith(('.png', '.jpg', '.jpeg', '.gif', '.svg', '.webp'))
+            ]
+            st.info(f"✅ Extracted {len(urls)} URLs")
             return urls
         else:
-            print(f"❌ Failed to fetch sitemap. Status Code: {response.status_code}")
+            st.error(f"❌ Failed to fetch sitemap. Status Code: {response.status_code}")
             return []
     except Exception as e:
-        print(f"❌ Error fetching sitemap: {e}")
+        st.error(f"❌ Error fetching sitemap: {e}")
         return []
+
 
 # Function to fetch and extract clean text content from a webpage
 def fetch_page_content(url):
@@ -176,43 +187,33 @@ def fetch_page_content(url):
     """
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-        "Referer": "url",
+        "Referer": "https://discplusprofiles.com/",
         "Accept-Language": "en-US,en;q=0.9",
         "Accept-Encoding": "gzip, deflate, br",
         "Connection": "keep-alive"
     }
 
     try:
-        st.info("in the function fetch page content"+url)
-        response = requests.get(url, headers=headers, timeout=20)
+        response = requests.get(url, headers=headers, timeout=10)
 
         if response.status_code != 200:
-            st.warning(f"❌ Failed to fetch page ({response.status_code}): {url}")
+            print(f"❌ Failed to fetch page ({response.status_code}): {url}")
             return ""
 
         soup = BeautifulSoup(response.content, "html.parser")
-        st.info("soup" + soup)
-        # Remove script and style tags
-        for script in soup(["script", "style", "noscript"]):
-            script.extract()
 
-        # Extract meaningful content
+        # Extract content from headings and paragraphs
         headings = [h.get_text().strip() for h in soup.find_all(['h1', 'h2', 'h3'])]
         paragraphs = [p.get_text().strip() for p in soup.find_all('p')]
-        divs = [div.get_text().strip() for div in soup.find_all('div') if len(div.get_text().strip()) > 100]  # Only large divs
 
-        # Combine headings, paragraphs, and large divs
-        content = "\n".join(headings + paragraphs + divs)
-        st,info("content" + content)
-        
-        st.write(f"Content length: {len(content.split())} words")
+        # Combine headings and paragraphs
+        content = "\n".join(headings + paragraphs)
 
         return content if content else "No content extracted."
 
     except Exception as e:
-        st.error(f"❌ Failed to extract page content: {e}")
+        print(f"❌ Failed to extract page content: {e}")
         return ""
-
 
 def summarize_content(all_content, llm_api_key):
     """Summarizes the combined content from all pages."""
@@ -348,20 +349,16 @@ page_parsed = fields.get("page_parsed", "")
 # Fetch and summarize sitemap content
 if campaign_generated == "No":
     urls = fetch_urls_from_sitemap(sitemap_url)
-    st.info(f"Url extracteds.")
-        # if urls:
-        #     st.info(f"{len(urls)} URLs found. Extracting content from the URLs...\n")
-        # urls = urls[:5]
+
+    if urls:
+        st.info(f"{len(urls)} URLs found. Extracting content from the URLs...\n")
+    urls = urls[:5]
     all_content = ""
-    # for idx, url in enumerate(urls, start=1):
-    url = "https://discplusprofiles.com/disc-plus-powerful-assessments/"
-    st.info(url)
-    content = fetch_page_content(url)
-    st.info("generated content" +content)
-    if len(all_content.split()) < 2000:
-        all_content += f"\n---\nContent from {url}:\n{content}\n"
-        st.info(all_content)
-    st.info("thiws is coming direct here " +all_content)
+    for idx, url in enumerate(urls, start=1):
+        content = fetch_page_content(url)
+        if len(all_content.split()) < 1000:
+            all_content += f"\n---\nContent from {url}:\n{content}\n"
+
     st.info("\n Extraction complete!")
     summary = summarize_content(all_content, llm_api_key)
     save_summary_to_airtable(record_id, summary, airtable_api_key)
