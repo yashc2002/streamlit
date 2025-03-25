@@ -348,6 +348,8 @@ if campaign_generated == "No":
         if len(all_content.split()) < 1000:
             all_content += f"\n---\nContent from {url}:\n{content}\n"
 
+
+    st.info(all_content)
     st.info("\n Extraction complete!")
     summary = summarize_content(all_content, llm_api_key)
     save_summary_to_airtable(record_id, summary, airtable_api_key)
