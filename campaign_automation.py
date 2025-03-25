@@ -183,7 +183,7 @@ def fetch_page_content(url):
     }
 
     try:
-        response = requests.get(url, headers=headers, timeout=10)
+        response = requests.get(url, headers=headers, timeout=10,verify=False)
 
         if response.status_code != 200:
             print(f"❌ Failed to fetch page ({response.status_code}): {url}")
@@ -195,13 +195,14 @@ def fetch_page_content(url):
         headings = [h.get_text().strip() for h in soup.find_all(['h1', 'h2', 'h3'])]
         paragraphs = [p.get_text().strip() for p in soup.find_all('p')]
 
-        # Combine headings and paragraphs
         content = "\n".join(headings + paragraphs)
 
         return content if content else "No content extracted."
 
     except Exception as e:
-        print(f"❌ Failed to extract page content: {e}")
+        # Print the full traceback to debug the error
+        print(f"❌ Exception occurred: {e}")
+        print(traceback.format_exc())
         return ""
 
 def summarize_content(all_content, llm_api_key):
