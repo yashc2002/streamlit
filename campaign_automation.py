@@ -73,7 +73,10 @@ def generate_json_sequences(topic, llm_api_key):
     # Email JSON sequence prompt
     email_prompt = f"""
     Create a 3-part email campaign for the topic below in **valid JSON format only** with no explanations or comments.
-    Output must start and end with `[` and `]`.
+    Output must start and end with `[` and `]`. 
+    note : Use {{first_name}},{{company_name}} (with double curly braces) as the placeholder for personalization 
+    The sender is Jay Niblick.and our website is https://discplusprofiles.com/
+    Note : Include the following Calendly link as the CTA in last sequence: https://calendly.com/jayn-innermetrix/30min don't include external links.
 
     **Topic:** {topic}
 
@@ -342,6 +345,7 @@ if campaign_generated == "No":
     all_content = ""
     for idx, url in enumerate(urls, start=1):
         content = fetch_page_content(url)
+        st.info(content)
         if len(all_content.split()) < 1000:
             all_content += f"\n---\nContent from {url}:\n{content}\n"
 
