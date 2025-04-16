@@ -65,43 +65,14 @@ def get_existing_campaigns(record_id, airtable_api_key):
 
     return existing_campaigns
 
-def generate_json_sequences(topic, llm_api_key):
+def generate_json_sequences(email_sequences_prompt,topic, llm_api_key):
     """Generates JSON sequences for email and LinkedIn campaigns."""
 
     st.info(f"Generating sequences for: {topic}")
 
     # Email JSON sequence prompt
-    email_prompt = f"""
-    Create a 3-part email campaign for the topic below in **valid JSON format only** with no explanations or comments.
-    Output must start and end with `[` and `]`. 
-    note : Use {{first_name}},{{company_name}} (with double curly braces) as the placeholder for personalization 
-    The sender is Jay Niblick.and our website is https://discplusprofiles.com/
-    Note : Include the following Calendly link as the CTA in last sequence: https://calendly.com/jayn-innermetrix/30min don't include external links.
+    email_prompt = f"{email_sequences_prompt} topic is {topic}"
 
-    **Topic:** {topic}
-
-    **JSON Format:**
-    [
-    {{
-        "seq_number": 1,
-        "seq_delay_details": {{"delay_in_days": 1}},
-        "subject": "Email subject",
-        "email_body": "HTML email content with {{first_name}} personalization."
-    }},
-    {{
-        "seq_number": 2,
-        "seq_delay_details": {{"delay_in_days": 2}},
-        "subject": "Follow-up subject",
-        "email_body": "Follow-up email content with CTA."
-    }},
-    {{
-        "seq_number": 3,
-        "seq_delay_details": {{"delay_in_days": 5}},
-        "subject": "Final push subject",
-        "email_body": "Final email content with CTA and link."
-    }}
-    ]
-    """
 
     # LinkedIn JSON sequence prompt
     linkedin_prompt = f"""
@@ -332,6 +303,7 @@ airtable_api_key = fields.get("airtable_api_key", "")
 llm_api_key = fields.get("llm_api_key", "")
 sitemap_url = fields.get("website_url", "")
 campaign_generation_prompt = fields.get("campaign_generation_prompt")
+email_sequences_prompt = fields.get("email_sequences_prompt")
 campaign_generated = fields.get("campaign_generated", "")
 page_parsed = fields.get("page_parsed", "")
 
@@ -360,7 +332,7 @@ topics = generate_campaign_topics(campaign_generation_prompt, page_parsed, llm_a
 
 campaigns = []
 for topic in topics:
-    email_json, linkedin_json = generate_json_sequences(topic, llm_api_key)
+    email_json, linkedin_json = generate_json_sequences(email_sequences_prompt,topic, llm_api_key)
     
     if email_json and linkedin_json:
         campaigns.append({
