@@ -69,9 +69,10 @@ def generate_json_sequences(email_sequences_prompt,topic, llm_api_key):
     """Generates JSON sequences for email and LinkedIn campaigns."""
 
     st.info(f"Generating sequences for: {topic}")
+    st.info(f"{email_sequences_prompt}")
 
     # Email JSON sequence prompt
-    email_prompt = f"{email_sequences_prompt} topic is {topic}"
+    email_prompt = f"{email_sequences_prompt} {topic}"
 
 
     # LinkedIn JSON sequence prompt
