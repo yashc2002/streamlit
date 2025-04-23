@@ -116,11 +116,11 @@ def generate_text(prompt, api_key):
             ],
             max_tokens=4000
         )
-
+        st.info(response)
         if response and response.choices:
             return response.choices[0].message.content.strip()
 
-        st.info(response)
+        
     except Exception as e:
         st.error(f"❌ Groq Generation Error: {e}")
         return None
