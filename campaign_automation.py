@@ -127,15 +127,30 @@ def generate_json_sequences(email_sequences_prompt, topic, llm_api_key, number_o
           {{"content": "Post 3"}}
         ]
         """
+        # email_json = generate_text(email_prompt, llm_api_key)
+        # linkedin_json = generate_text(linkedin_prompt, llm_api_key)
+        # st.warning(f"Raw email response (#{i+1}): {email_json}")
+        # st.warning(f"Raw LinkedIn response (#{i+1}): {linkedin_json}")
+        # try:
+        #     email_data = json.loads(email_json)
+        #     linkedin_data = json.loads(linkedin_json)
+        # except Exception as e:
+        #     st.error(f"[Sequence {i+1}] Invalid JSON format: {e}")
+        #     continue
         email_json = generate_text(email_prompt, llm_api_key)
         linkedin_json = generate_text(linkedin_prompt, llm_api_key)
-        st.warning(f"Raw email response (#{i+1}): {email_json}")
-        st.warning(f"Raw LinkedIn response (#{i+1}): {linkedin_json}")
+        if not email_json.strip():
+            st.error(f"[Sequence {i+1}] Empty response for email JSON")
+            continue
+        if not linkedin_json.strip():
+            st.error(f"[Sequence {i+1}] Empty response for LinkedIn JSON")
+            continue
         try:
             email_data = json.loads(email_json)
             linkedin_data = json.loads(linkedin_json)
         except Exception as e:
             st.error(f"[Sequence {i+1}] Invalid JSON format: {e}")
+            st.info(f"Raw email response:\n{email_json}")
             continue
 
         st.info(f" {email_data}")
