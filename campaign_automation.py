@@ -115,9 +115,9 @@ def generate_json_sequences(email_sequences_prompt, topic, llm_api_key, number_o
         email_prompt = f"""
         Generate cold email sequence #{i+1} for topic: "{topic}".
         {email_sequences_prompt}
-        Respond in valid JSON format as a list of objects with `subject` and `content`.
+        Respond in valid JSON format.
         """
-
+        st.info(f"Generating {email_prompt}")
         linkedin_prompt = f"""
         Create LinkedIn outreach sequence #{i+1} for topic: "{topic}".
         Respond in valid JSON format as:
