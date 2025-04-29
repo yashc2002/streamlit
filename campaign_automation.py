@@ -65,14 +65,13 @@ def get_existing_campaigns(record_id, airtable_api_key):
 
     return existing_campaigns
 
-def generate_json_sequences(email_sequences_prompt,topic, llm_api_key, number_of_sequences):
+def generate_json_sequences(email_sequences_prompt,topic, llm_api_key):
     """Generates JSON sequences for email and LinkedIn campaigns."""
 
     st.info(f"Generating sequences for: {topic}")
     st.info(f"{email_sequences_prompt}")
     # Email JSON sequence prompt
-    for i in range(number_of_sequences):
-        email_prompt = f"Generate cold email sequence {i+1} {email_sequences_prompt} {topic}"
+    email_prompt = f"{email_sequences_prompt} {topic}"
 
 
     # LinkedIn JSON sequence prompt
