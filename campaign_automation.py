@@ -127,10 +127,10 @@ def generate_json_sequences(email_sequences_prompt, topic, llm_api_key, number_o
           {{"content": "Post 3"}}
         ]
         """
-
         email_json = generate_text(email_prompt, llm_api_key)
         linkedin_json = generate_text(linkedin_prompt, llm_api_key)
-
+        st.warning(f"Raw email response (#{i+1}): {email_json}")
+        st.warning(f"Raw LinkedIn response (#{i+1}): {linkedin_json}")
         try:
             email_data = json.loads(email_json)
             linkedin_data = json.loads(linkedin_json)
@@ -350,7 +350,7 @@ campaign_generation_prompt = fields.get("campaign_generation_prompt")
 email_sequences_prompt = fields.get("email_sequences_prompt")
 campaign_generated = fields.get("campaign_generated", "")
 page_parsed = fields.get("page_parsed", "")
-number_of_sequences = fields.get("number_of_sequences", "") # limit max to 12
+number_of_sequences = fields.get("number_of_sequences", "")
 
 # Fetch and summarize sitemap content
 if campaign_generated == "No":
