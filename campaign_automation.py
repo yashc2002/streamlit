@@ -65,99 +65,45 @@ def get_existing_campaigns(record_id, airtable_api_key):
 
     return existing_campaigns
 
-# def generate_json_sequences(email_sequences_prompt,topic, llm_api_key, number_of_sequences):
-#     """Generates JSON sequences for email and LinkedIn campaigns."""
+def generate_json_sequences(email_sequences_prompt,topic, llm_api_key, number_of_sequences):
+    """Generates JSON sequences for email and LinkedIn campaigns."""
 
-#     st.info(f"Generating sequences for: {topic}")
-#     st.info(f"{email_sequences_prompt}")
-#     # Email JSON sequence prompt
-#     for i in range(number_of_sequences):
-#         email_prompt = f"Generate cold email sequence {i+1} {email_sequences_prompt} {topic}"
-
-
-#     # LinkedIn JSON sequence prompt
-#     linkedin_prompt = f"""
-#     Create a 3-part LinkedIn post series for the topic below in **valid JSON format only** with no comments.
-#     Output must start and end with `[` and `]`.
-
-#     **Topic:** {topic}
-
-#     **JSON Format:**
-#     [
-#     {{"content": "First LinkedIn post with problem and solution"}},
-#     {{"content": "Second LinkedIn post with insights"}},
-#     {{"content": "Third LinkedIn post with a strong CTA"}}
-#     ]
-#     """
-
-#     # Generate JSON sequences
-#     email_json = generate_text(email_prompt, llm_api_key)
-#     linkedin_json = generate_text(linkedin_prompt, llm_api_key)
-
-#     try:
-#         email_data = json.loads(email_json)
-#         linkedin_data = json.loads(linkedin_json)
-#     except Exception as e:
-#         st.error(f"Invalid JSON format: {e}")
-#         return None, None
-
-#     return json.dumps(email_data), json.dumps(linkedin_data)
-
-def generate_json_sequences(email_sequences_prompt, topic, llm_api_key, number_of_sequences):
-    """Generates and returns two arrays: one for emails, one for LinkedIn posts — without keys."""
-
-    st.info(f"Generating {number_of_sequences} sequences for: {topic}")
-    
-    all_email_sequences = []
-    all_linkedin_sequences = []
-
+    st.info(f"Generating sequences for: {topic}")
+    st.info(f"{email_sequences_prompt}")
+    # Email JSON sequence prompt
     for i in range(number_of_sequences):
-        email_prompt = f"""
-        Generate cold email sequence #{i+1} for topic: "{topic}".
-        {email_sequences_prompt}
-        
-        """
-        # st.info(f"Generating {email_prompt}")
-        # linkedin_prompt = f"""
-        # Create LinkedIn outreach sequence #{i+1} for topic: "{topic}".
-       
-        # [
-        #   {{"content": "Post 1"}},
-        #   {{"content": "Post 2"}},
-        #   {{"content": "Post 3"}}
-        # ]
-        # """
-        # email_json = generate_text(email_prompt, llm_api_key)
-        # linkedin_json = generate_text(linkedin_prompt, llm_api_key)
-        # st.warning(f"Raw email response (#{i+1}): {email_json}")
-        # st.warning(f"Raw LinkedIn response (#{i+1}): {linkedin_json}")
-        # try:
-        #     email_data = json.loads(email_json)
-        #     linkedin_data = json.loads(linkedin_json)
-        # except Exception as e:
-        #     st.error(f"[Sequence {i+1}] Invalid JSON format: {e}")
-        #     continue
-        email_json = generate_text(email_prompt, llm_api_key)
-        # linkedin_json = generate_text(linkedin_prompt, llm_api_key)
-        if not email_json.strip():
-            st.error(f"[Sequence {i+1}] Empty response for email JSON")
-            continue
-        # if not linkedin_json.strip():
-        #     st.error(f"[Sequence {i+1}] Empty response for LinkedIn JSON")
-        #     continue
-        try:
-            email_data = json.loads(email_json)
-            # linkedin_data = json.loads(linkedin_json)
-        except Exception as e:
-            st.error(f"[Sequence {i+1}] Invalid JSON format: {e}")
-            st.info(f"Raw email response:\n{email_json}")
-            continue
+        email_prompt = f"Generate cold email sequence {i+1} {email_sequences_prompt} {topic}"
 
-        st.info(f" {email_data}")
-        all_email_sequences.extend(email_data)
-        # all_linkedin_sequences.extend(linkedin_data)
 
-    return all_email_sequences, all_linkedin_sequences
+    # LinkedIn JSON sequence prompt
+    linkedin_prompt = f"""
+    Create a 3-part LinkedIn post series for the topic below in **valid JSON format only** with no comments.
+    Output must start and end with `[` and `]`.
+
+    **Topic:** {topic}
+
+    **JSON Format:**
+    [
+    {{"content": "First LinkedIn post with problem and solution"}},
+    {{"content": "Second LinkedIn post with insights"}},
+    {{"content": "Third LinkedIn post with a strong CTA"}}
+    ]
+    """
+
+    # Generate JSON sequences
+    email_json = generate_text(email_prompt, llm_api_key)
+    linkedin_json = generate_text(linkedin_prompt, llm_api_key)
+
+    try:
+        email_data = json.loads(email_json)
+        linkedin_data = json.loads(linkedin_json)
+    except Exception as e:
+        st.error(f"Invalid JSON format: {e}")
+        return None, None
+
+    return json.dumps(email_data), json.dumps(linkedin_data)
+
+
 
 
 # ✅ LLM Text Generation
@@ -365,7 +311,6 @@ campaign_generation_prompt = fields.get("campaign_generation_prompt")
 email_sequences_prompt = fields.get("email_sequences_prompt")
 campaign_generated = fields.get("campaign_generated", "")
 page_parsed = fields.get("page_parsed", "")
-number_of_sequences = fields.get("number_of_sequences", "")
 
 # Fetch and summarize sitemap content
 if campaign_generated == "No":
@@ -391,7 +336,7 @@ topics = generate_campaign_topics(campaign_generation_prompt, page_parsed, llm_a
 
 campaigns = []
 for topic in topics:
-    email_json, linkedin_json = generate_json_sequences(email_sequences_prompt,topic, llm_api_key,number_of_sequences)
+    email_json, linkedin_json = generate_json_sequences(email_sequences_prompt,topic, llm_api_key)
     
     if email_json and linkedin_json:
         campaigns.append({
