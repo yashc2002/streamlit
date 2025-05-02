@@ -83,7 +83,7 @@ def generate_json_sequences(email_sequences_prompt,topic, llm_api_key):
 
     **JSON Format:**
     [
-    {{"content": "First LinkedIn post with problem and solution"}},
+    {{"content": "First LinkedIn post with CTA"}},
     {{"content": "Second LinkedIn post with insights"}},
     {{"content": "Third LinkedIn post with a strong CTA"}}
     ]
@@ -94,8 +94,8 @@ def generate_json_sequences(email_sequences_prompt,topic, llm_api_key):
     linkedin_json = generate_text(linkedin_prompt, llm_api_key)
 
     try:
-        email_data = safe_json_parse(email_json, "Email")
-        linkedin_data = safe_json_parse(linkedin_json, "LinkedIn")
+        email_data = json.loads(email_json)
+        linkedin_data = json.loads(linkedin_json)
     except Exception as e:
         st.error(f"Invalid JSON format: {e}")
         return None, None
@@ -146,15 +146,6 @@ def fetch_urls_from_sitemap(sitemap_url):
     except Exception as e:
         print(f"❌ Error fetching sitemap: {e}")
         return []
-    
-def safe_json_parse(data, label=""):
-    try:
-        return json.loads(data)
-    except Exception as e:
-        st.error(f"⚠️ {label} JSON parse failed: {e}")
-        st.code(data, language="json")
-        return None
-
 
 # Function to fetch and extract clean text content from a webpage
 def fetch_page_content(url):
@@ -330,6 +321,7 @@ if campaign_generated == "No":
     all_content = ""
     for idx, url in enumerate(urls, start=1):
         content = fetch_page_content(url)
+        st.info(content)
         if len(all_content.split()) < 1000:
             all_content += f"\n---\nContent from {url}:\n{content}\n"
 
