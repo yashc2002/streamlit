@@ -94,8 +94,8 @@ def generate_json_sequences(email_sequences_prompt,topic, llm_api_key):
     linkedin_json = generate_text(linkedin_prompt, llm_api_key)
 
     try:
-        email_data = json.loads(email_json)
-        linkedin_data = json.loads(linkedin_json)
+        email_data = safe_json_parse(email_json, "Email")
+        linkedin_data = safe_json_parse(linkedin_json, "LinkedIn")
     except Exception as e:
         st.error(f"Invalid JSON format: {e}")
         return None, None
@@ -146,6 +146,15 @@ def fetch_urls_from_sitemap(sitemap_url):
     except Exception as e:
         print(f"❌ Error fetching sitemap: {e}")
         return []
+    
+def safe_json_parse(data, label=""):
+    try:
+        return json.loads(data)
+    except Exception as e:
+        st.error(f"⚠️ {label} JSON parse failed: {e}")
+        st.code(data, language="json")
+        return None
+
 
 # Function to fetch and extract clean text content from a webpage
 def fetch_page_content(url):
